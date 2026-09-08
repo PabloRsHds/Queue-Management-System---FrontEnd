@@ -127,14 +127,14 @@
                 </svg>
               </div>
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <strong>{{ user.username }}</strong>
+                <strong>{{ user.username || '-' }}</strong>
                 <strong style="font-size: 12px; color: #7f8a99;">{{ getRole(user.role) || 'Usuário' }}</strong>
               </div>
             </div>
           </td>
 
           <td data-label="E-mail" (click)="openModalView(user.userId)">
-            <strong>{{ user.email }}</strong>
+            <strong>{{ user.email || '-' }}</strong>
           </td>
 
           <td data-label="Status" (click)="openModalView(user.userId)">
@@ -696,7 +696,7 @@
               </div>
               <div class="input-group">
                 <label>Telefone <span class="required">*</span></label>
-                <input type="text" formControlName="phone" placeholder="(21) 99999-9999">
+                <input type="text" formControlName="phone" placeholder="(21) 99999-9999" mask="(00) 00000-0000">
               </div>
               <div class="input-group">
                 <label>Username <span class="required">*</span></label>
@@ -925,7 +925,7 @@
 
         <div class="modal-delete-info">
           <div class="modal-delete-info-name">
-            <strong>Usuário:</strong> <p>{{ this.userInfo()?.username }}</p>
+            <strong>Usuário:</strong> <p>{{ this.userInfo()?.username || '-' }}</p>
           </div>
 
           <div class="modal-delete-info-status">

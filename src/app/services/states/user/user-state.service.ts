@@ -1,6 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpService } from '../../backend/http.service';
-import { ResponseAllUsersDto } from '../../../dtos/users/ResponseAllUsersDto';
 import { RequestUserDto } from '../../../dtos/users/RequestUserDto';
 import { ResponseUserInfoDto } from '../../../dtos/users/ResponseUserInfoDto';
 import { UpdateUserDto } from '../../../dtos/users/UpdateUserDto';
@@ -10,6 +9,7 @@ import { ResponseUsersCreatedByMonthStatisticsDto } from '../../../dtos/users/st
 import { ResponseServicesByUserStatisticsDto } from '../../../dtos/users/statistics/ResponseServicesByUserStatisticsDto';
 import { ResponseUsersByRoleStatisticsDto } from '../../../dtos/users/statistics/ResponseUsersByRoleStatisticsDto';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ResponseUserDto } from '../../../dtos/users/ResponseUserDto';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,7 @@ export class UserStateService {
   private http = inject(HttpService);
 
   // Signals
-  public users = signal<ResponseAllUsersDto[]>([]);
+  public users = signal<ResponseUserDto[]>([]);
   public userLogged = signal<ResponseUserInfoDto | null>(null);
   public userInfo = signal<ResponseUserInfoDto | null>(null);
 
@@ -65,7 +65,13 @@ export class UserStateService {
 
         this.registerMessage.set('Usuario criado com sucesso!');
         this.registerStatus.set('success');
-        this.loadingAllUsers();
+
+        this.page.set(0);
+
+        this.users.update(users => {
+          this.totalElements.update(total => total + 1);
+          return [response, ...users];
+        });
       },
       error: (error: HttpErrorResponse) => {
         this.registerMessage.set(error.error?.message || 'Erro ao criar usuario');
@@ -77,10 +83,13 @@ export class UserStateService {
   updateUser(request: UpdateUserDto) {
 
     this.http.updateUser(request).subscribe({
-      next: () => {
+      next: (response) => {
         this.updateMessage.set('Usuario atualizado com sucesso!');
         this.updateStatus.set('success');
-        this.loadingAllUsers();
+
+        this.users.update(users =>
+          users.map(user => user.userId === request.userId ? response : user)
+        );
       },
       error: (error: HttpErrorResponse) => {
         this.updateMessage.set(error.error?.message || 'Erro ao atualizar usuario');
@@ -98,7 +107,10 @@ export class UserStateService {
       next: () => {
         this.deleteMessage.set('Usuario deletado com sucesso!');
         this.deleteStatus.set('success');
-        this.loadingAllUsers();
+
+        this.page.set(0);
+
+        this.users.update(users => users.filter(user => user.userId !== userId));
       },
       error: (error: HttpErrorResponse) => {
         this.deleteMessage.set(error.error?.message || 'Erro ao deletar usuario');

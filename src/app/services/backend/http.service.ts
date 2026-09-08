@@ -10,7 +10,6 @@ import { UpdateDepartmentDto } from '../../dtos/department/UpdateDepartmentDto';
 import { UpdateServiceManagementDto } from '../../dtos/services/UpdateServiceManagementDto';
 import { ResponseGetServiceByIdDto } from '../../dtos/services/ResponseGetServiceByIdDto';
 import { ResponseUserDto } from '../../dtos/users/ResponseUserDto';
-import { ResponseAllUsersDto } from '../../dtos/users/ResponseAllUsersDto';
 import { RequestUserDto } from '../../dtos/users/RequestUserDto';
 import { ResponseServiceNamesAndDepartments } from '../../dtos/services/ResponseServiceNamesAndDepartments';
 import { ResponseUserInfoDto } from '../../dtos/users/ResponseUserInfoDto';
@@ -264,8 +263,8 @@ export class HttpService {
     );
   }
 
-  public getAllUsers(page: number, size: number, search?: string): Observable<PageResponse<ResponseAllUsersDto>> {
-    return this.http.get<PageResponse<ResponseAllUsersDto>>(
+  public getAllUsers(page: number, size: number, search?: string): Observable<PageResponse<ResponseUserDto>> {
+    return this.http.get<PageResponse<ResponseUserDto>>(
       `${this.API_URL}/users?page=${page}&size=${size}&search=${search ?? ''}`,
       { withCredentials: true }
     );
